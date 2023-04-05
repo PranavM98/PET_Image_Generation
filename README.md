@@ -13,5 +13,5 @@ Step 2: Add data into this directory.
 Step 3: Run the code!
 <br>
 ```python
-MIP.py
+python MIP.py
 ```
