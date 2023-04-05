@@ -1,6 +1,6 @@
 import argparse
 import numpy as np
-from scipy.ndimage.interpolation import rotate
+from scipy.ndimage import rotate
 import os
 import matplotlib.pyplot as plt
 import imageio
@@ -41,18 +41,19 @@ def mip(img,angles,depth_weighting):
         r=float(input("Enter the Exponential Constant, between 0 and 0.1 for better clarity\n"))
     if depth_weighting=='Linear':
         r=float(input("Enter the Linear Lower Limit (must be a number between 0 and 1)\n"))
-    for angle in range(angles):
+    angles_final=np.linspace(0,360,angles)
+    for i,angle in enumerate(angles_final):
         rotated = rotate(img, angle=angle,reshape=False)
         mip=np.amax(rotated, axis=0)
         arg=np.argmax(rotated, axis=0)
 
         if depth_weighting=='Linear':
-            final_matrix[:,:,angle]= linear_attenuation(mip,arg)
+            final_matrix[:,:,i]= linear_attenuation(mip,arg)
         elif depth_weighting=='Exponential':
             
-            final_matrix[:,:,angle]= exponential_attenuation(mip,arg,r)
+            final_matrix[:,:,i]= exponential_attenuation(mip,arg,r)
         else:
-            final_matrix[:,:,angle]=mip
+            final_matrix[:,:,i]=mip
     return final_matrix
 
 
@@ -86,16 +87,18 @@ def main():
     depth_weighting=input("Type of Depth Weighting? No, Linear, Exponential (Capitalization Matters)\n")
     mip_image=mip(img,angles,depth_weighting)
     mip_image=mip_image.astype('float32')
-    print(mip_image.shape)
+  
+    mip_image=np.transpose(mip_image,(1,0,2))
+
     print("Binary File Saved as: ",
-                file+'_mip_Rot:'+str(angles)+'_DW:'+depth_weighting+'.bin')
+                file+'_mip_Rot_'+str(angles)+'_DW_'+depth_weighting+'.bin')
                 
-    mip_image.tofile(file+'_mip_Rot:'+str(angles)+'_DW:'+depth_weighting+'.bin')
+    mip_image.tofile(file+'_mip_Rot_'+str(angles)+'_DW_'+depth_weighting+'.bin')
 
     final_list=[]
     for i in range(mip_image.shape[2]):
        
-        final_list.append( mip_image[:,:,i].T)
+        final_list.append( mip_image[:,:,i])
     print("GIF File Saved as: ",
                 file+'_mip_Rot_'+str(angles)+'_DW_'+depth_weighting+'.gif')
                 
