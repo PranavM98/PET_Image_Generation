@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 from scipy.ndimage.interpolation import rotate
 import os
+import matplotlib.pyplot as plt
 import imageio
 #Algorithm
 '''
@@ -12,7 +13,7 @@ Input:
     4. Depth Weighting
 
 Output:
-    1.MIP image in the format (Width, # Slices, Angles of Rotations) 
+    1.MIP image in the format (Width, # Slices, Angles of Rotations)
 '''
 
 
@@ -26,7 +27,7 @@ def exponential_attenuation(mip,arg,r):
     return final_mip
 
 def linear_attenuation(mip,arg):
-    la=np.linspace(1,0.01,mip.shape[0])
+    la=np.linspace(1,0.9,mip.shape[0])
     final_mip=final_mip=np.zeros((mip.shape[0],mip.shape[1]))
     for i in range(mip.shape[1]):
         for j in range(mip.shape[0]):
@@ -38,6 +39,8 @@ def mip(img,angles,depth_weighting):
     final_matrix=np.zeros((img.shape[0],img.shape[2],angles))
     if depth_weighting=='Exponential':
         r=float(input("Enter the Exponential Constant, between 0 and 0.1 for better clarity\n"))
+    if depth_weighting=='Linear':
+        r=float(input("Enter the Linear Lower Limit (must be a number between 0 and 1)\n"))
     for angle in range(angles):
         rotated = rotate(img, angle=angle,reshape=False)
         mip=np.amax(rotated, axis=0)
@@ -70,11 +73,19 @@ def main():
     depth_weighting=input("Type of Depth Weighting? No, Linear, Exponential\n")
     mip_image=mip(img,angles,depth_weighting)
     mip_image=mip_image.astype('float32')
-    mip_image.tofile(file+'_mip-Rot:'+str(angles)+'_DW:'+depth_weighting+'.bin')
+    print(mip_image.shape)
+    print("Binary File Saved as: ",
+                file+'_mip_Rot:'+str(angles)+'_DW:'+depth_weighting+'.bin')
+                
+    mip_image.tofile(file+'_mip_Rot:'+str(angles)+'_DW:'+depth_weighting+'.bin')
 
     final_list=[]
-    for i in range(mip_image.shape[2]):  
-        final_list.append(mip_image[:,:,i])
+    for i in range(mip_image.shape[2]):
+       
+        final_list.append( mip_image[:,:,i].T)
+    print("GIF File Saved as: ",
+                file+'_mip_Rot_'+str(angles)+'_DW_'+depth_weighting+'.gif')
+                
+    imageio.mimsave(file+'_mip_Rot_'+str(angles)+'_DW_'+depth_weighting+'.gif', final_list)
 
-    imageio.mimsave(file+'_mip-Rot:'+str(angles)+'_DW:'+depth_weighting+'.gif', final_list)
 main()
