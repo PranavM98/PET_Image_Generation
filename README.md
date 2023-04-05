@@ -1,1 +1,1 @@
-# PET_Image_Generation
+# PET_MIP_Generation
