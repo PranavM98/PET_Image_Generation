@@ -12,4 +12,6 @@ Step 2: Add data into this directory.
 <br>
 Step 3: Run the code!
 <br>
+```python
 python MIP.py
+```
