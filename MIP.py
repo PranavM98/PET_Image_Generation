@@ -59,9 +59,22 @@ def mip(img,angles,depth_weighting):
 def main():
     while(True):
         file=input("Enter the File\n")
-        angles=int(input("Enter Projection Angles\n"))
-        width=int(input("Enter the width\n"))
-        slices=int(input("Enter the number of slices\n"))
+        
+        try:
+            angles=int(input("Enter Projection Angles (Must be an integer between 0-360)\n"))
+        except:
+            angles=int(input("Please enter the correct type for Projection Angle (Must be an integer between 0-360)\n"))
+        
+        try:
+            width=int(input("Enter the width (Must be an Integer)\n"))
+        except:
+            width=int(input("Please enter the correct type for Width (Must be an integer)\n"))
+        
+        try:
+            slices=int(input("Enter the Number of Slices (Must be an Integer)\n"))
+        except:
+            slices=int(input("Please enter the correct type for Slice (Must be an integer)\n"))
+
         try:
             img=np.fromfile(file, np.float32).reshape(slices,width,width)
             img=np.transpose(img,(1,2,0))
@@ -70,7 +83,7 @@ def main():
             print("Error with inputting file. Please check the file name or the shape")
     print("Input Successful")
 
-    depth_weighting=input("Type of Depth Weighting? No, Linear, Exponential\n")
+    depth_weighting=input("Type of Depth Weighting? No, Linear, Exponential (Capitalization Matters)\n")
     mip_image=mip(img,angles,depth_weighting)
     mip_image=mip_image.astype('float32')
     print(mip_image.shape)
